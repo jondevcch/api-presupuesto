@@ -16,6 +16,14 @@ const PresupuestoSchema = mongoose.Schema({
     monto: {
         type: Number,
         required: true
+    },
+    totalGasto: {
+        type: Number,
+        required: false
+    },
+    balance: {
+        type: Number,
+        required: false
     }
 });
 

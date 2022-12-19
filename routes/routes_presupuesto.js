@@ -1,18 +1,21 @@
 const express = require('express');
-const routes_presupuesto = express.Router();
+const routes = express.Router();
 const Presupuesto = require('../models/presupuesto');
-const ObjectID = require('mongoose').Types.ObjectID;
+const Gasto = require('../models/gastos');
+const ObjectId = require('mongoose').Types.ObjectId;
 
-routes_presupuesto.get('/servicioDisponible', (req, res) => {
+routes.get('/servicioDisponible', (req, res) => {
     res.json({ 'Servicio disponible': 'presupuesto' });
 });
 
-routes_presupuesto.post('/presupuesto', (req, res) => {
+routes.post('/presupuesto', (req, res) => {
     let nuevo_presupuesto = new Presupuesto({
         nombre: req.body.nombre,
         categoria: req.body.categoria,
         monto: req.body.monto,
-        divisa: req.body.divisa
+        divisa: req.body.divisa,
+        totalGasto: Number(req.body.totalGasto),
+        balance: Number(req.body.balance),
     });
 
     nuevo_presupuesto.save((error, presupuesto) => {
@@ -24,7 +27,7 @@ routes_presupuesto.post('/presupuesto', (req, res) => {
     });
 });
 
-routes_presupuesto.get('/presupuestos', (req, res) => {
+routes.get('/presupuestos', (req, res) => {
     Presupuesto.find((error, presupuestos) => {
         if (error) {
             return res.json({ msg: "Error al cargar los presupuestos" });
@@ -34,7 +37,7 @@ routes_presupuesto.get('/presupuestos', (req, res) => {
     });
 });
 
-routes_presupuesto.get('/presupuesto/:id', (req, res) => {
+routes.get('/presupuesto/:id', (req, res) => {
     let presupuesto_id = req.params.id;
     if (!ObjectId.isValid(presupuesto_id)) return res.status(400).send(`No existe un presupuesto con el ID: ${contact_id}`);
 
@@ -47,7 +50,7 @@ routes_presupuesto.get('/presupuesto/:id', (req, res) => {
     })
 });
 
-routes_presupuesto.put('/presupuesto/:id', (req, res) => {
+routes.put('/presupuesto/:id', (req, res) => {
     let presupuesto_id = req.params.id;
     if (!ObjectId.isValid(presupuesto_id))
         return res
@@ -74,5 +77,41 @@ routes_presupuesto.put('/presupuesto/:id', (req, res) => {
 
 });
 
+//Servicios para gastos
 
-module.exports = routes_presupuesto;
+routes.post('/gasto', (req, res) => {
+    let nuevo_gasto = new Gasto({
+        id_presupuesto: req.body.id_presupuesto,
+        nombre_gasto: req.body.nombre_gasto,
+        monto_gasto: req.body.monto_gasto
+    });
+
+    nuevo_gasto.save((error, gasto) => {
+        if (error) {
+            res.json({ msg: "Error al agregar el gasto para el presupuesto" });
+        } else {
+            res.json({ msg: "Gasto agregado correctamente", gasto });
+
+            //Totalizar gastos
+
+
+        }
+    });
+});
+
+routes.get('/gastosPresupuesto/:id', (req, res) => {
+    let presupuesto_id = req.params.id;
+
+    if (!ObjectId.isValid(presupuesto_id)) return res.status(400).send(`No existe un presupuesto con el ID: ${contact_id}`);
+
+    Gasto.find({ id_presupuesto: presupuesto_id }, (error, gastos) => {
+        if (error) {
+            return res.json({ msg: "Error al cargar los gastos" });
+        }
+
+        res.json(gastos);
+    })
+});
+
+
+module.exports = routes;
