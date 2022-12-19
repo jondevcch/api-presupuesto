@@ -18,3 +18,7 @@ app.use('/curso_angular/api', routes_presupuesto);
 app.listen(api_port, () => {
     console.info(`Backend server running on port ${api_port}`);
 });
+
+app.get("/", (req, res) => {
+    res.send("Iniciando servicios");
+});
