@@ -8,14 +8,13 @@ routes.get('/servicioDisponible', (req, res) => {
     res.json({ 'Servicio disponible': 'presupuesto' });
 });
 
+//Agregar presupuesto
 routes.post('/presupuesto', (req, res) => {
     let nuevo_presupuesto = new Presupuesto({
         nombre: req.body.nombre,
         categoria: req.body.categoria,
         monto: req.body.monto,
-        divisa: req.body.divisa,
-        totalGasto: Number(req.body.totalGasto),
-        balance: Number(req.body.balance),
+        divisa: req.body.divisa
     });
 
     nuevo_presupuesto.save((error, presupuesto) => {
@@ -27,6 +26,7 @@ routes.post('/presupuesto', (req, res) => {
     });
 });
 
+//Obtener presupuestos
 routes.get('/presupuestos', (req, res) => {
     Presupuesto.find((error, presupuestos) => {
         if (error) {
@@ -37,6 +37,7 @@ routes.get('/presupuestos', (req, res) => {
     });
 });
 
+//Obtener Informacion de un presupuesto
 routes.get('/presupuesto/:id', (req, res) => {
     let presupuesto_id = req.params.id;
     if (!ObjectId.isValid(presupuesto_id)) return res.status(400).send(`No existe un presupuesto con el ID: ${presupuesto_id}`);
@@ -50,6 +51,7 @@ routes.get('/presupuesto/:id', (req, res) => {
     });
 });
 
+//Actualizar presupuesto
 routes.put('/presupuesto/:id', (req, res) => {
     let presupuesto_id = req.params.id;
     if (!ObjectId.isValid(presupuesto_id))
@@ -77,16 +79,18 @@ routes.put('/presupuesto/:id', (req, res) => {
 
 });
 
+//Eliminar presupuesto
 routes.delete('/presupuesto/:id', (req, res) => {
+    let presupuesto_id = req.params.id;
     if (!ObjectId.isValid(req.params.id))
         return res
             .status(400)
             .send(`No existe un presupuesto con el ID: ${presupuesto_id}`);
 
-    Presupuesto.findByIdAndDelete({ _id: req.params.id }, (error, result) => {
+    Presupuesto.findByIdAndDelete({ _id: presupuesto_id }, (error, result) => {
         if (error) {
             console.error(`HTTP DELETE error: ${error}`);
-            res.json({ msg: `Error al borrar el presupuesto con el id: ${req.body.id}` });
+            res.json({ msg: `Error al borrar el presupuesto con el id: ${presupuesto_id}` });
         } else {
             res.json({ msg: "Presupuesto eliminado correctamente: ", result });
         }
@@ -99,9 +103,9 @@ routes.delete('/presupuesto/:id', (req, res) => {
 
 routes.post('/gasto', (req, res) => {
     let nuevo_gasto = new Gasto({
-        id_presupuesto: req.body.id_presupuesto,
-        nombre_gasto: req.body.nombre_gasto,
-        monto_gasto: req.body.monto_gasto
+        idPresupuesto: req.body.idPresupuesto,
+        nombre: req.body.nombre,
+        monto: req.body.monto
     });
 
     nuevo_gasto.save((error, gasto) => {
@@ -112,6 +116,60 @@ routes.post('/gasto', (req, res) => {
         }
     });
 });
+
+routes.get('/gasto/:id', (req, res) => {
+    let gasto_id = req.params.id;
+    if (!ObjectId.isValid(gasto_id)) return res.status(400).send(`No existe un gasto con el ID: ${gasto_id}`);
+    Gasto.findOne({ _id: gasto_id }, (error, gasto) => {
+        if (error) {
+            return res.json({ msg: "Error al cargar el gasto" });
+        }
+        res.json(gasto);
+    });
+});
+
+routes.put('/gasto/:id', (req, res) => {
+    let gasto_id = req.params.id;
+    if (!ObjectId.isValid(gasto_id))
+        return res
+            .status(400)
+            .send(`No existe un gasto con el ID: ${gasto_id}`);
+
+    const gasto_actualizado = {
+        nombre: req.body.nombre,
+        monto: req.body.monto
+    };
+
+    Gasto.findByIdAndUpdate(
+        req.params.id, { $set: gasto_actualizado }, { new: true },
+        (error, result) => {
+            if (!error) {
+                res.send(result);
+            } else {
+                console.error(`Error al actualizar el gasto: ${JSON.stringify(error)} `);
+            }
+        }
+    );
+
+});
+
+routes.delete('/gasto/:id', (req, res) => {
+    let gasto_id = req.params.id;
+    if (!ObjectId.isValid(req.params.id))
+        return res
+            .status(400)
+            .send(`No existe un gasto con el ID: ${gasto_id}`);
+
+    Gasto.findByIdAndDelete({ _id: req.params.id }, (error, result) => {
+        if (error) {
+            res.json({ msg: `Error al borrar el gasto con el id: ${gasto_id}` });
+        } else {
+            res.json({ msg: "Gasto eliminado correctamente: ", result });
+        }
+    });
+
+});
+
 
 routes.get('/gastosPresupuesto/:id', (req, res) => {
     let presupuesto_id = req.params.id;
@@ -126,5 +184,7 @@ routes.get('/gastosPresupuesto/:id', (req, res) => {
         res.json(gastos);
     })
 });
+
+
 
 module.exports = routes;

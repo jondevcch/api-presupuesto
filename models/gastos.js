@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 const GastosSchema = mongoose.Schema({
-    id_presupuesto: {
+    idPresupuesto: {
         type: String,
         required: true
     },
-    nombre_gasto: {
+    nombre: {
         type: String,
         required: true
     },
-    monto_gasto: {
+    monto: {
         type: Number,
         required: true
     }
