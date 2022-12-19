@@ -4,9 +4,9 @@ const express = require('express');
 
 const cors = require('cors');
 
-const db = require('../database/db');
+const db = require('./database/db');
 
-const routes_presupuesto = require('../routes/routes_presupuesto');
+const routes_presupuesto = require('./routes/routes_presupuesto');
 
 const api_port = process.env.PORT || 4000;
 
