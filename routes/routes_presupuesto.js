@@ -77,7 +77,7 @@ routes.put('/presupuesto/:id', (req, res) => {
 
 });
 
-router.delete('/presupuesto/:id', (req, res) => {
+routes.delete('/presupuesto/:id', (req, res) => {
     if (!ObjectId.isValid(req.params.id))
         return res
             .status(400)
