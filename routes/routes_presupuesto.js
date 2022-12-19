@@ -39,7 +39,7 @@ routes.get('/presupuestos', (req, res) => {
 
 routes.get('/presupuesto/:id', (req, res) => {
     let presupuesto_id = req.params.id;
-    if (!ObjectId.isValid(presupuesto_id)) return res.status(400).send(`No existe un presupuesto con el ID: ${contact_id}`);
+    if (!ObjectId.isValid(presupuesto_id)) return res.status(400).send(`No existe un presupuesto con el ID: ${presupuesto_id}`);
 
     Presupuesto.findOne({ _id: presupuesto_id }, (error, presupuesto) => {
         if (error) {
@@ -47,7 +47,7 @@ routes.get('/presupuesto/:id', (req, res) => {
         }
 
         res.json(presupuesto);
-    })
+    });
 });
 
 routes.put('/presupuesto/:id', (req, res) => {
@@ -77,6 +77,24 @@ routes.put('/presupuesto/:id', (req, res) => {
 
 });
 
+router.delete('/presupuesto/:id', (req, res) => {
+    if (!ObjectId.isValid(req.params.id))
+        return res
+            .status(400)
+            .send(`No existe un presupuesto con el ID: ${presupuesto_id}`);
+
+    Presupuesto.findByIdAndDelete({ _id: req.params.id }, (error, result) => {
+        if (error) {
+            console.error(`HTTP DELETE error: ${error}`);
+            res.json({ msg: `Error al borrar el presupuesto con el id: ${req.body.id}` });
+        } else {
+            res.json({ msg: "Presupuesto eliminado correctamente: ", result });
+        }
+    });
+
+});
+
+
 //Servicios para gastos
 
 routes.post('/gasto', (req, res) => {
@@ -91,10 +109,6 @@ routes.post('/gasto', (req, res) => {
             res.json({ msg: "Error al agregar el gasto para el presupuesto" });
         } else {
             res.json({ msg: "Gasto agregado correctamente", gasto });
-
-            //Totalizar gastos
-
-
         }
     });
 });
@@ -112,6 +126,5 @@ routes.get('/gastosPresupuesto/:id', (req, res) => {
         res.json(gastos);
     })
 });
-
 
 module.exports = routes;
