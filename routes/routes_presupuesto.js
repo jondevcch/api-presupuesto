@@ -176,7 +176,8 @@ routes.get('/gastosPresupuesto/:id', (req, res) => {
 
     if (!ObjectId.isValid(presupuesto_id)) return res.status(400).send(`No existe un presupuesto con el ID: ${contact_id}`);
 
-    Gasto.find({ id_presupuesto: presupuesto_id }, (error, gastos) => {
+    console.log(presupuesto_id);
+    Gasto.find({ idPresupuesto: presupuesto_id }, (error, gastos) => {
         if (error) {
             return res.json({ msg: "Error al cargar los gastos" });
         }
